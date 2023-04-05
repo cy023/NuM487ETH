@@ -11,14 +11,14 @@
 
 #include <stdint.h>
 
-#define PLL_CLOCK           192000000
+#define PLL_CLOCK 192000000UL
 
 /*******************************************************************************
  * Public Function
  ******************************************************************************/
 /**
  * @brief System initialization.
- * 
+ *
  *  - system_gpio_init()
  *  - system_clock_init()
  *  - system_uart_init()
@@ -28,7 +28,7 @@ void system_init(void);
 
 /**
  * @brief System deinitialization.
- * 
+ *
  *  - system_gpio_deinit()
  *  - system_clock_deinit()
  *  - system_uart_deinit()
@@ -42,4 +42,4 @@ void system_deinit(void);
  */
 void system_delay_ms(uint32_t ms);
 
-#endif  /* SYSTEM_H */
+#endif /* SYSTEM_H */

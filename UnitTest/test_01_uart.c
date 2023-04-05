@@ -2,8 +2,7 @@
  * @file test_01_sysnow.c
  * @author cy023
  * @date 2022.09.17
- * @brief 
- * 
+ * @brief
  */
 
 #include <stdio.h>
