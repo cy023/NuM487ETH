@@ -12,8 +12,8 @@
 TARGET = main
 
 # Upload Info.
-COMPORT    ?= COM16
-UPLOAD_HEX ?= main
+COMPORT    ?=
+UPLOAD_HEX ?= test_rmii
 
 ## MCU Info.
 CPU       = -mcpu=cortex-m4
@@ -37,6 +37,7 @@ LIBDIRS =
 ## Include Path
 C_INCLUDES  = -I.
 C_INCLUDES += -ICore
+C_INCLUDES += -IConfig
 C_INCLUDES += -IDevice_Startup
 C_INCLUDES += -IDrivers/CMSIS
 C_INCLUDES += -IDrivers/HAL
@@ -45,7 +46,8 @@ C_INCLUDES += -IDrivers/Library/StdDriver/inc
 
 ## Source Path
 C_SOURCES += $(wildcard Device_Startup/*.c)
-C_SOURCES += $(wildcard Drivers/HAL/*.c)
+C_SOURCES += $(wildcard Drivers/HAL/system.c)
+C_SOURCES += $(wildcard Drivers/HAL/ethernet_phy.c)
 C_SOURCES += $(wildcard Drivers/Library/Device/Nuvoton_M480/Source/*.c)
 # C_SOURCES += $(wildcard Drivers/Library/StdDriver/src/*.c)
 C_SOURCES += Drivers/Library/StdDriver/src/sys.c
@@ -53,6 +55,7 @@ C_SOURCES += Drivers/Library/StdDriver/src/uart.c
 C_SOURCES += Drivers/Library/StdDriver/src/retarget.c
 C_SOURCES += Drivers/Library/StdDriver/src/clk.c
 C_SOURCES += Drivers/Library/StdDriver/src/gpio.c
+C_SOURCES += Drivers/Library/StdDriver/src/emac.c
 
 ASM_SOURCES += $(wildcard Device_Startup/*.S)
 
