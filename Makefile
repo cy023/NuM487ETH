@@ -13,7 +13,7 @@ TARGET = main
 
 # Upload Info.
 COMPORT    ?=
-UPLOAD_HEX ?= test_rmii
+UPLOAD_HEX ?= test_02_rmii
 
 ## MCU Info.
 CPU       = -mcpu=cortex-m4

@@ -6,14 +6,12 @@
  *
  */
 
-#include <stdbool.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "NuMicro.h"
-#include "assert.h"
 
 #include "config_phy.h"
 #include "ethernet_phy.h"
-#include "ethernet_mac.h"
 
 #define ASSERT(condition)     \
     do {                      \

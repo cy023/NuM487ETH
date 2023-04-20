@@ -15,6 +15,9 @@
 // MAC address
 uint8_t g_au8MacAddr[6] = {0x00, 0x00, 0x00, 0x59, 0x16, 0x88};
 
+void mac_layer_init(void);
+void phy_layer_init(void);
+
 void print_IEEE802_3_reg(void)
 {
     uint16_t ethphy_reg;
@@ -74,17 +77,20 @@ int main()
     printf("System Boot.\n");
     printf("[test]: Print IEEE802.3 PHY Registers ...\n");
 
-    EMAC_Open(g_au8MacAddr);
-
-    ethernet_phy_reset();
-    ethernet_phy_init();
-
-    bool link_up = false;
-    while (!link_up) {
-        ethernet_phy_get_link_status(&link_up);
-    }
-    printf("Ethernet link up\n");
+    mac_layer_init();
+    phy_layer_init();
 
     print_IEEE802_3_reg();
     return 0;
+}
+
+void mac_layer_init(void)
+{
+    EMAC_Open(g_au8MacAddr);
+}
+
+void phy_layer_init(void)
+{
+    ethernet_phy_reset();
+    ethernet_phy_init();
 }
