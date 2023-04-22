@@ -1,7 +1,7 @@
 /**
- * @file test_03_rmii.c
+ * @file test_02_rmii.c
  * @author cy023
- * @date 2023.04.05
+ * @date 2023.04.20
  * @brief
  *
  */
@@ -13,7 +13,7 @@
 #include "ethernet_phy.h"
 
 // MAC address
-uint8_t g_au8MacAddr[6] = {0x00, 0x00, 0x00, 0x59, 0x16, 0x88};
+uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
 
 void mac_layer_init(void);
 void phy_layer_init(void);
@@ -86,7 +86,7 @@ int main()
 
 void mac_layer_init(void)
 {
-    EMAC_Open(g_au8MacAddr);
+    EMAC_Open(mac_addr);
 }
 
 void phy_layer_init(void)

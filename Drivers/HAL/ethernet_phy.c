@@ -132,6 +132,25 @@ void ethernet_phy_clear_reg_bit(uint16_t reg, uint16_t offset)
 void ethernet_phy_init(void)
 {
     ethernet_phy_write_reg(ETH_PHY_BMCR, CONF_ETHERNET_PHY_CONTROL_BMCR);
+    /* Check link partner capability */
+    uint32_t u32Reg = EMAC_MdioRead(ETH_PHY_ANLPAR, EMAC_PHY_ADDR) ;
+
+    if (u32Reg & ETH_PHY_ANLPAR_100BASE_TX_FDX_MASK) {
+        EMAC->CTL |= EMAC_CTL_OPMODE_Msk;
+        EMAC->CTL |= EMAC_CTL_FUDUP_Msk;
+    }
+    else if (u32Reg & ETH_PHY_ANLPAR_100BASE_TX_HDX_MASK) {
+        EMAC->CTL |= EMAC_CTL_OPMODE_Msk;
+        EMAC->CTL &= ~EMAC_CTL_FUDUP_Msk;
+    }
+    else if (u32Reg & ETH_PHY_ANLPAR_10BASE_T_FDX_MASK) {
+        EMAC->CTL &= ~EMAC_CTL_OPMODE_Msk;
+        EMAC->CTL |= EMAC_CTL_FUDUP_Msk;
+    }
+    else {
+        EMAC->CTL &= ~EMAC_CTL_OPMODE_Msk;
+        EMAC->CTL &= ~EMAC_CTL_FUDUP_Msk;
+    }
 }
 
 void ethernet_phy_set_powerdown(bool state)

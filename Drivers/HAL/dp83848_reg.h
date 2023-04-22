@@ -69,7 +69,7 @@
 #define ETH_PHY_BMSR_100BASE_T4_POS             (15) /*!< T4 mode */
 #define ETH_PHY_BMSR_100BASE_TX_FDX_POS         (14) /*!< 100MBps full duplex */
 #define ETH_PHY_BMSR_100BASE_TX_HDX_POS         (13) /*!< 100MBps half duplex */
-#define ETH_PHY_BMSR_10BASE_T_FDX_POS           (12) /*!< 100Bps full duplex */
+#define ETH_PHY_BMSR_10BASE_T_FDX_POS           (12) /*!< 10MBps full duplex */
 #define ETH_PHY_BMSR_10BASE_T_HDX_POS           (11) /*!< 10MBps half duplex */
 #define ETH_PHY_BMSR_MF_PREAMBLE_SUPRESS_POS    (6)  /*!< Auto-negotation complete */
 #define ETH_PHY_BMSR_AUTONEG_COMP_POS           (5)  /*!< Auto-negotation complete */
@@ -91,5 +91,16 @@
 #define ETH_PHY_BMSR_LINK_STATUS_MASK           (1 << ETH_PHY_BMSR_LINK_STATUS_POS)
 #define ETH_PHY_BMSR_JABBER_DETECT_MASK         (1 << ETH_PHY_BMSR_JABBER_DETECT_POS)
 #define ETH_PHY_BMSR_EXTEND_CAPABILITY_MASK     (1 << ETH_PHY_BMSR_EXTEND_CAPABILITY_POS)
+
+/* PHY ANLPAR register bit definitions */
+#define ETH_PHY_ANLPAR_100BASE_TX_FDX_POS       (8) /*!< 100MBps full duplex */
+#define ETH_PHY_ANLPAR_100BASE_TX_HDX_POS       (7) /*!< 100MBps half duplex */
+#define ETH_PHY_ANLPAR_10BASE_T_FDX_POS         (6) /*!< 10MBps full duplex */
+#define ETH_PHY_ANLPAR_10BASE_T_HDX_POS         (5) /*!< 10MBps half duplex */
+
+#define ETH_PHY_ANLPAR_100BASE_TX_FDX_MASK      (1 << ETH_PHY_ANLPAR_100BASE_TX_FDX_POS)
+#define ETH_PHY_ANLPAR_100BASE_TX_HDX_MASK      (1 << ETH_PHY_ANLPAR_100BASE_TX_HDX_POS)
+#define ETH_PHY_ANLPAR_10BASE_T_FDX_MASK        (1 << ETH_PHY_ANLPAR_10BASE_T_FDX_POS)
+#define ETH_PHY_ANLPAR_10BASE_T_HDX_MASK        (1 << ETH_PHY_ANLPAR_10BASE_T_HDX_POS)
 
 #endif /* DP83848_REG_H */
