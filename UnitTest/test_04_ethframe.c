@@ -22,68 +22,27 @@ typedef struct eth_frame {
     uint8_t payload[50];
 } eth_frame_t;
 
-eth_frame_t outframe, inframe;
+eth_frame_t outframe;
+uint8_t inframe[1514];
+
+char tx_msg[] = "HELLO Ethernet! I'am NuM487.";
 uint32_t packetLen;
+
+volatile bool recv_flag = false;
 
 // MAC address
 uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
 
-char tx_msg[] = "HELLO Ethernet! I'am NuM487.";
-
-volatile bool recv_flag = false;
-
-void EMAC_TX_IRQHandler(void)
-{
-    PH4 ^= 1;
-    // Clean up Tx resource occupied by previous sent packet(s)
-    EMAC_SendPktDone();
-}
-
-void EMAC_RX_IRQHandler(void)
-{
-    NVIC_DisableIRQ(EMAC_RX_IRQn);
-    PH5 ^= 1;
-    recv_flag = true;
-    while (1) {
-        // Check if there's any packets available
-        if (EMAC_RecvPkt((uint8_t *) &inframe, &packetLen) == 0)
-            break;
-        // Clean up Rx resource occupied by previous received packet
-        EMAC_RecvPktDone();
-    }
-    NVIC_EnableIRQ(EMAC_RX_IRQn);
-}
-
-void mac_layer_init(void)
-{
-    EMAC_Open(mac_addr);
-
-    // TODO: set filter
-
-    NVIC_EnableIRQ(EMAC_TX_IRQn);
-    NVIC_EnableIRQ(EMAC_RX_IRQn);
-
-    EMAC_ENABLE_TX();
-    EMAC_ENABLE_RX();
-}
-
-void phy_layer_init(void)
-{
-    EMAC_PhyInit();
-    // ethernet_phy_reset();
-    // ethernet_phy_init();
-
-    // bool link_up = false;
-    // while (!link_up) {
-    //     ethernet_phy_get_link_status(&link_up);
-    // }
-    // printf("Ethernet link up\n");
-}
+void mac_layer_init(void);
+void phy_layer_init(void);
 
 void printEtherFrame(eth_frame_t *ethframe, const char *str)
 {
     if (ethframe->type != 0x3713)
         return;
+
+    EMAC_DISABLE_TX();
+    EMAC_DISABLE_RX();
 
     printf("\n\t\x1b[0;32;32mINFO\x1b[0;m : %s\n", str);
     printf("\t===== \x1b[;31;1mETHERNET FRAME HEADER\x1b[0;m =====\n");
@@ -99,6 +58,9 @@ void printEtherFrame(eth_frame_t *ethframe, const char *str)
     printf("\t============ \x1b[;31;1mPAYLOAD\x1b[0;m ============\n");
     printf("\t| Payload : %s\n", ethframe->payload);
     printf("\t=================================\n\n");
+
+    EMAC_ENABLE_TX();
+    EMAC_ENABLE_RX();
 }
 
 
@@ -126,14 +88,58 @@ int main()
     phy_layer_init();
 
     uint32_t res = EMAC_SendPkt((uint8_t *) &outframe, sizeof(outframe));
-    printf("res = %ld\n", res);
+    printf("\n[Response] EMAC_SendPkt: %ld\n", res);
     printEtherFrame(&outframe, "I'am outframe.");
 
     while (1) {
         if (recv_flag) {
-            printEtherFrame(&inframe, "I'am inframe.");
+            printEtherFrame((eth_frame_t *) &inframe, "I'am inframe.");
             recv_flag = false;
         }
     }
     return 0;
+}
+
+void mac_layer_init(void)
+{
+    EMAC_Open(mac_addr);
+
+    NVIC_EnableIRQ(EMAC_TX_IRQn);
+    NVIC_EnableIRQ(EMAC_RX_IRQn);
+
+    EMAC_ENABLE_TX();
+    EMAC_ENABLE_RX();
+}
+
+void phy_layer_init(void)
+{
+    EMAC_PhyInit();
+    // ethernet_phy_reset();
+    // ethernet_phy_init();
+
+    // bool link_up = false;
+    // while (!link_up) {
+    //     ethernet_phy_get_link_status(&link_up);
+    // }
+    // printf("Ethernet link up\n");
+}
+
+void EMAC_TX_IRQHandler(void)
+{
+    PH4 ^= 1;
+    // Clean up Tx resource occupied by previous sent packet(s)
+    EMAC_SendPktDone();
+}
+
+void EMAC_RX_IRQHandler(void)
+{
+    PH5 ^= 1;
+    recv_flag = true;
+    while (1) {
+        // Check if there's any packets available
+        if (EMAC_RecvPkt((uint8_t *) &inframe, &packetLen) == 0)
+            break;
+        // Clean up Rx resource occupied by previous received packet
+        EMAC_RecvPktDone();
+    }
 }
