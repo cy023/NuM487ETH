@@ -10,6 +10,7 @@
 #define ETHERNET_PHY_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "dp83848_reg.h"
 
 /*******************************************************************************

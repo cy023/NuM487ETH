@@ -7,7 +7,6 @@
  */
 
 #include <stdio.h>
-#include <stdbool.h>
 #include "NuMicro.h"
 
 #include "config_phy.h"
