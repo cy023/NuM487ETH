@@ -126,7 +126,7 @@ static volatile EMAC_DESCRIPTOR_T tx_desc[EMAC_TX_DESC_SIZE];
 static volatile EMAC_FRAME_T tx_buf[EMAC_TX_DESC_SIZE];
 
 
-static uint32_t u32CurrentTxDesc, u32NextTxDesc, u32CurrentRxDesc;
+uint32_t u32CurrentTxDesc, u32NextTxDesc, u32CurrentRxDesc;
 static uint32_t s_u32EnableTs = 0UL;
 
 static void EMAC_MdioWrite(uint32_t u32Reg, uint32_t u32Addr, uint32_t u32Data);

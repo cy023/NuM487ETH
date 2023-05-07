@@ -661,7 +661,7 @@ typedef volatile unsigned long  vu32;       ///< Define 32-bit unsigned volatile
 /******************************************************************************/
 /*                         Peripheral header files                            */
 /******************************************************************************/
-#include "sys.h"
+#include "m480_sys.h"
 #include "clk.h"
 
 #include "acmp.h"

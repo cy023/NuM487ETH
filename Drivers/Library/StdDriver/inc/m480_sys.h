@@ -1,5 +1,5 @@
 /**************************************************************************//**
- * @file     SYS.h
+ * @file     M480_SYS.h
  * @version  V3.0
  * @brief    M480 Series SYS Driver Header File
  *

@@ -39,10 +39,15 @@ static void system_clock_init(void)
     CLK_EnableModuleClock(UART0_MODULE);
     /* Enable EMAC clock */
     CLK_EnableModuleClock(EMAC_MODULE);
+    /* Enable TMR0 clock */
+    CLK_EnableModuleClock(TMR0_MODULE);
 
     /* Select UART clock source from HXT and UART module clock divider as 1 */
     CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART0SEL_HXT,
                        CLK_CLKDIV0_UART0(1));
+
+    /* Select TMR0 clock source from HXT */
+    CLK_SetModuleClock(TMR0_MODULE, CLK_CLKSEL1_TMR0SEL_HXT, 0);
 
     // Configure MDC clock rate to HCLK / (127 + 1) = 1.5 MHz if system is
     // running at 192 MHz

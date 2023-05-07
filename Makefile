@@ -13,7 +13,7 @@ TARGET = main
 
 # Upload Info.
 COMPORT    ?=
-UPLOAD_HEX ?= test_02_rmii
+UPLOAD_HEX ?= main
 
 ## MCU Info.
 CPU       = -mcpu=cortex-m4
@@ -43,6 +43,22 @@ C_INCLUDES += -IDrivers/CMSIS
 C_INCLUDES += -IDrivers/HAL
 C_INCLUDES += -IDrivers/Library/Device/Nuvoton_M480/Include
 C_INCLUDES += -IDrivers/Library/StdDriver/inc
+C_INCLUDES += -IMiddleware/lwIP/include
+C_INCLUDES += -IMiddleware/lwIP/include/compat/posix
+C_INCLUDES += -IMiddleware/lwIP/include/compat/posix/arpa
+C_INCLUDES += -IMiddleware/lwIP/include/compat/posix/net
+C_INCLUDES += -IMiddleware/lwIP/include/compat/posix/sys
+C_INCLUDES += -IMiddleware/lwIP/include/compat/stdc
+C_INCLUDES += -IMiddleware/lwIP/include/lwip
+C_INCLUDES += -IMiddleware/lwIP/include/lwip/apps
+C_INCLUDES += -IMiddleware/lwIP/include/lwip/priv
+C_INCLUDES += -IMiddleware/lwIP/include/lwip/prot
+C_INCLUDES += -IMiddleware/lwIP/include/netif
+C_INCLUDES += -IMiddleware/lwIP/include/netif/ppp
+C_INCLUDES += -IMiddleware/lwIP/include/netif/ppp/polarssl
+C_INCLUDES += -IMiddleware/lwIP/include/netif/ppp/polarssl
+C_INCLUDES += -IMiddleware/lwIP/port
+C_INCLUDES += -IMiddleware/lwIP/port/arch
 
 ## Source Path
 C_SOURCES += $(wildcard Device_Startup/*.c)
@@ -50,12 +66,25 @@ C_SOURCES += $(wildcard Drivers/HAL/system.c)
 C_SOURCES += $(wildcard Drivers/HAL/ethernet_phy.c)
 C_SOURCES += $(wildcard Drivers/Library/Device/Nuvoton_M480/Source/*.c)
 # C_SOURCES += $(wildcard Drivers/Library/StdDriver/src/*.c)
-C_SOURCES += Drivers/Library/StdDriver/src/sys.c
+C_SOURCES += Drivers/Library/StdDriver/src/m480_sys.c
 C_SOURCES += Drivers/Library/StdDriver/src/uart.c
 C_SOURCES += Drivers/Library/StdDriver/src/retarget.c
 C_SOURCES += Drivers/Library/StdDriver/src/clk.c
 C_SOURCES += Drivers/Library/StdDriver/src/gpio.c
 C_SOURCES += Drivers/Library/StdDriver/src/emac.c
+C_SOURCES += Drivers/Library/StdDriver/src/timer.c
+
+### lwIP
+C_SOURCES += $(wildcard Middleware/lwIP/api/*.c)
+# C_SOURCES += $(wildcard Middleware/lwIP/apps/*.c)
+C_SOURCES += $(wildcard Middleware/lwIP/core/*.c)
+C_SOURCES += $(wildcard Middleware/lwIP/core/ipv4/*.c)
+# C_SOURCES += $(wildcard Middleware/lwIP/core/ipv6/*.c)
+C_SOURCES += $(wildcard Middleware/lwIP/netif/*.c)
+C_SOURCES += $(wildcard Middleware/lwIP/netif/ppp/*.c)
+# C_SOURCES += $(wildcard Middleware/lwIP/netif/ppp/polarssl/*.c)
+C_SOURCES += $(wildcard Middleware/lwIP/port/*.c)
+C_SOURCES += $(wildcard Middleware/lwIP/port/arch/*.c)
 
 ASM_SOURCES += $(wildcard Device_Startup/*.S)
 

@@ -1,65 +1,122 @@
 #include <stdio.h>
-#include "NuMicro.h"
+#include <stdbool.h>
+#include <string.h>
 #include "system.h"
-#include "net.h"
+#include "NuMicro.h"
 
-// Our MAC address
-uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
+#include "ethernetif.h"
+#include "ethernet_phy.h"
+#include "netif/ethernet.h"
 
-// Our IP address
-uint8_t volatile ip_addr[4] = {0, 0, 0, 0};
+#include "lwip/tcpip.h"
+#include "lwip/apps/lwiperf.h"
+#include "lwip/etharp.h"
+#include "lwip/netif.h"
+#include "lwip/timeouts.h"
+#include "lwip/init.h"
 
-uint8_t rx_buffer[1514];
-uint32_t packetLen;
+#include "udpecho_raw.h"
 
-// Descriptor pointers holds current Tx and Rx used by IRQ handler here.
-uint32_t u32CurrentTxDesc, u32CurrentRxDesc;
+volatile bool recv_flag = false;
+struct netif gnetif;
 
-void EMAC_TX_IRQHandler(void)
+void lwip_layer_init(void);
+
+void printIPaddr(void)
 {
-    // Clean up Tx resource occupied by previous sent packet(s)
-    EMAC_SendPktDone();
+    static char tmp_buff[16];
+    printf("IP_ADDR    : %s\r\n",
+           ipaddr_ntoa_r((const ip_addr_t *) &(gnetif.ip_addr), tmp_buff, 16));
+    printf("NET_MASK   : %s\r\n",
+           ipaddr_ntoa_r((const ip_addr_t *) &(gnetif.netmask), tmp_buff, 16));
+    printf("GATEWAY_IP : %s\r\n\r\n",
+           ipaddr_ntoa_r((const ip_addr_t *) &(gnetif.gw), tmp_buff, 16));
+}
+
+void timer0_init(void)
+{
+    // Set timer frequency to 100HZ
+    TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 100);
+
+    // Enable timer interrupt
+    TIMER_EnableInt(TIMER0);
+    NVIC_EnableIRQ(TMR0_IRQn);
+
+    // Start Timer 0
+    TIMER_Start(TIMER0);
+}
+
+int main(void)
+{
+    system_init();
+    timer0_init();
+    printf("[test]: TCP/IP Ping Test over lwIP Stack\n\n");
+    lwip_layer_init();
+
+    bool link_up = false;
+    ethernet_phy_get_link_status(&link_up);
+    /* Print IP address info */
+    if (link_up && gnetif.ip_addr.addr) {
+        printf("Hello Connection!\n");
+        printIPaddr();
+    }
+
+    NVIC_EnableIRQ(EMAC_TX_IRQn);
+    NVIC_EnableIRQ(EMAC_RX_IRQn);
+    EMAC_ENABLE_TX();  // TODO: Enable opportunity?
+    EMAC_ENABLE_RX();  // TODO: Enable opportunity?
+
+    udpecho_raw_init();
+
+    while (1) {
+        /* LWIP timers - ARP, DHCP, TCP, etc. */
+        sys_check_timeouts();
+        if (recv_flag) {
+            recv_flag = false;
+            printf(":)\n");
+        }
+    }
+}
+
+void lwip_layer_init(void)
+{
+    ip_addr_t ipaddr, netmask, gw;
+
+    IP4_ADDR(&gw, 192, 168, 0, 1);
+    IP4_ADDR(&ipaddr, 192, 168, 0, 23);
+    IP4_ADDR(&netmask, 255, 255, 255, 0);
+
+    /* Initilialize the LwIP stack without RTOS */
+    lwip_init();
+
+    /* add the network interface (IPv4/IPv6) without RTOS */
+    netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init,
+              &netif_input);
+
+    /* Registers the default network interface */
+    netif_set_default(&gnetif);
+
+    if (netif_is_link_up(&gnetif)) {
+        /* When the netif is fully configured this function must be called */
+        netif_set_up(&gnetif);
+        printf("netif_set_up\n\n");
+    } else {
+        /* When the netif link is down this function must be called */
+        netif_set_down(&gnetif);
+        printf("netif_set_down\n\n");
+    }
 }
 
 void EMAC_RX_IRQHandler(void)
 {
-    while (1) {
-        // Check if there's any packets available
-        if (EMAC_RecvPkt(rx_buffer, &packetLen) == 0)
-            break;
-        // Process receive packet
-        process_rx_packet(rx_buffer, packetLen);
-        // Clean up Rx resource occupied by previous received packet
-        EMAC_RecvPktDone();
-    }
+    PH5 ^= 1;
+    recv_flag = true;
+    ethernetif_input(&gnetif);
 }
 
-
-int main()
+void EMAC_TX_IRQHandler(void)
 {
-    system_init();
-    printf("[Test] EMAC_TxRx\n");
-
-    // Select RMII interface by default
-    EMAC_Open(mac_addr);
-
-    // Init phy
-    EMAC_PhyInit();
-
-    NVIC_EnableIRQ(EMAC_TX_IRQn);
-    NVIC_EnableIRQ(EMAC_RX_IRQn);
-
-    EMAC_ENABLE_RX();
-    EMAC_ENABLE_TX();
-
-    if (dhcp_start() < 0) {
-        // Cannot get a DHCP lease, use static IP.
-        printf("DHCP failed, use static IP 192.168.10.10\n");
-        ip_addr[0] = 0xC0;
-        ip_addr[1] = 0xA8;
-        ip_addr[2] = 0x0A;
-        ip_addr[3] = 0x0A;
-    }
-    while (1)
-        ;
+    PH4 ^= 1;
+    // Clean up Tx resource occupied by previous sent.
+    EMAC_SendPktDone();
 }

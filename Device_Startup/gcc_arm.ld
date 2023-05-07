@@ -13,6 +13,9 @@ MEMORY
   RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 128K 
 }
 
+__STACK_SIZE = 0x8000;
+__HAEP_SIZE = 0x8000;
+
 /* Library configurations */
 GROUP(libgcc.a libc.a libm.a libnosys.a)
 
