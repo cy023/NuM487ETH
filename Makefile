@@ -86,6 +86,11 @@ C_SOURCES += $(wildcard Middleware/lwIP/netif/ppp/*.c)
 C_SOURCES += $(wildcard Middleware/lwIP/port/*.c)
 C_SOURCES += $(wildcard Middleware/lwIP/port/arch/*.c)
 
+### lwIP_contrib
+C_INCLUDES += -IMiddleware/lwIP-contrib/apps/udpecho_raw
+C_SOURCES += $(wildcard Middleware/lwIP-contrib/apps/udpecho_raw/*.c)
+
+## ASM Source Path
 ASM_SOURCES += $(wildcard Device_Startup/*.S)
 
 ################################################################################

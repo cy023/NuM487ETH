@@ -3,7 +3,8 @@ import signal
 import sys
 import select
 
-HOST = '127.0.0.1'
+# HOST = '127.0.0.1'
+HOST = '192.168.0.23'
 PORT = 7
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
