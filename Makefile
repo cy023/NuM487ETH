@@ -56,7 +56,6 @@ C_INCLUDES += -IMiddleware/lwIP/include/lwip/prot
 C_INCLUDES += -IMiddleware/lwIP/include/netif
 C_INCLUDES += -IMiddleware/lwIP/include/netif/ppp
 C_INCLUDES += -IMiddleware/lwIP/include/netif/ppp/polarssl
-C_INCLUDES += -IMiddleware/lwIP/include/netif/ppp/polarssl
 C_INCLUDES += -IMiddleware/lwIP/port
 C_INCLUDES += -IMiddleware/lwIP/port/arch
 
@@ -89,6 +88,8 @@ C_SOURCES += $(wildcard Middleware/lwIP/port/arch/*.c)
 ### lwIP_contrib
 C_INCLUDES += -IMiddleware/lwIP-contrib/apps/udpecho_raw
 C_SOURCES += $(wildcard Middleware/lwIP-contrib/apps/udpecho_raw/*.c)
+C_INCLUDES += -IMiddleware/lwIP-contrib/apps/tcpecho_raw
+C_SOURCES += $(wildcard Middleware/lwIP-contrib/apps/tcpecho_raw/*.c)
 
 ## ASM Source Path
 ASM_SOURCES += $(wildcard Device_Startup/*.S)
