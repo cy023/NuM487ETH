@@ -10,7 +10,9 @@
 #include "NuMicro.h"
 #include "system.h"
 
-uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
+// MAC address
+// uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
+extern uint8_t mac_addr[6];
 
 void EMAC_TX_IRQHandler(void)
 {

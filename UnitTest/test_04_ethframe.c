@@ -31,7 +31,8 @@ uint32_t packetLen;
 volatile bool recv_flag = false;
 
 // MAC address
-uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
+// uint8_t mac_addr[6] = {0x66, 0x66, 0x66, 0x66, 0x66, 0x66};
+extern uint8_t mac_addr[6];
 
 void mac_layer_init(void);
 void phy_layer_init(void);
