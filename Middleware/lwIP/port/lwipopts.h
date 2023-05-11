@@ -1,6 +1,8 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+// #define LWIP_HTTPD 1
+
 #define LWIP_IPV4 1
 
 #define LWIP_IPV6 0
@@ -25,6 +27,13 @@
 #define NO_SYS_NO_TIMERS 0
 
 /* ---------- Memory options ---------- */
+/** ETH_PAD_SIZE: number of bytes added before the ethernet header to ensure
+ * alignment of payload after that header. Since the header is 14 bytes long,
+ * without this padding e.g. addresses in the IP header will not be aligned
+ * on a 32-bit boundary, so setting this to 2 can speed up 32-bit-platforms.
+ */
+// #define ETH_PAD_SIZE 2
+
 /* MEM_ALIGNMENT: should be set to the alignment of the CPU for which
     lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
     byte alignment -> define MEM_ALIGNMENT to 2. */
@@ -155,8 +164,20 @@ turning this on does currently not work. */
     ---------- Lwip Debug options ----------
     ----------------------------------------
 */
-#define LWIP_DEBUG      1
-#define ICMP_DEBUG      LWIP_DBG_ON
-#define ICMP_ECHO_DEBUG LWIP_DBG_ON
+#define LWIP_DEBUG       1
+#define ICMP_DEBUG       LWIP_DBG_ON
+#define ICMP_ECHO_DEBUG  LWIP_DBG_ON
+
+// #define TCP_DEBUG        LWIP_DBG_ON
+// #define TCP_INPUT_DEBUG  LWIP_DBG_ON
+// #define TCP_FR_DEBUG     LWIP_DBG_ON
+// #define TCP_RTO_DEBUG    LWIP_DBG_ON
+// #define TCP_CWND_DEBUG   LWIP_DBG_ON
+// #define TCP_WND_DEBUG    LWIP_DBG_ON
+// #define TCP_OUTPUT_DEBUG LWIP_DBG_ON
+// #define TCP_RST_DEBUG    LWIP_DBG_ON
+// #define TCP_QLEN_DEBUG   LWIP_DBG_ON
+// #define UDP_DEBUG        LWIP_DBG_ON
+// #define TCPIP_DEBUG      LWIP_DBG_ON
 
 #endif /* __LWIPOPTS_H__ */

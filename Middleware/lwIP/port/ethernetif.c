@@ -117,10 +117,10 @@ static void mac_layer_init(void)
 {
     EMAC_Open(mac_addr);
 
-    // NVIC_EnableIRQ(EMAC_TX_IRQn);
-    // NVIC_EnableIRQ(EMAC_RX_IRQn);
-    // EMAC_ENABLE_TX();   // TODO: Enable opportunity?
-    // EMAC_ENABLE_RX();   // TODO: Enable opportunity?
+    NVIC_EnableIRQ(EMAC_TX_IRQn);
+    NVIC_EnableIRQ(EMAC_RX_IRQn);
+    EMAC_ENABLE_TX();
+    EMAC_ENABLE_RX();
 }
 
 /**
@@ -192,10 +192,6 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     EMAC_DESCRIPTOR_T *desc;
     u32_t status;
 
-#if ETH_PAD_SIZE
-    pbuf_remove_header(p, ETH_PAD_SIZE); /* drop the padding word */
-#endif
-
     /* Get Tx frame descriptor & data pointer */
     desc = (EMAC_DESCRIPTOR_T *) u32NextTxDesc;
 
@@ -205,10 +201,18 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     if ((status & EMAC_DESC_OWN_EMAC) == EMAC_DESC_OWN_EMAC)
         return ERR_USE;
 
+#if ETH_PAD_SIZE
+    pbuf_remove_header(p, ETH_PAD_SIZE); /* drop the padding word */
+#endif
+
     memcpy((u8_t *) desc->u32Data, p->payload, p->len);
 
     /* Set Tx descriptor transmit byte count */
     desc->u32Status2 = p->len;
+
+#if ETH_PAD_SIZE
+    pbuf_add_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
+#endif
 
     /* Change descriptor ownership to EMAC */
     desc->u32Status1 |= EMAC_DESC_OWN_EMAC;
@@ -218,10 +222,6 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 
     /* Trigger EMAC to send the packet */
     EMAC_TRIGGER_TX();
-
-#if ETH_PAD_SIZE
-    pbuf_add_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
-#endif
 
     return ERR_OK;
 }
@@ -240,6 +240,7 @@ static struct pbuf *low_level_input(struct netif *netif)
     volatile EMAC_DESCRIPTOR_T *cur_rx_desc =
         (volatile EMAC_DESCRIPTOR_T *) u32CurrentRxDesc;
     u32_t status;
+    u16_t len;
 
     status = EMAC->INTSTS & 0xFFFF;
     EMAC->INTSTS = status;
@@ -257,22 +258,30 @@ static struct pbuf *low_level_input(struct netif *netif)
         return NULL;
 
     if (status & EMAC_RXFD_RXGD) {
+        len = status & 0xFFFF;
+
+#if ETH_PAD_SIZE
+        len += ETH_PAD_SIZE; /* allow room for Ethernet padding */
+#endif
+
         /* Allocate pbuf from pool (avoid using heap in interrupts) */
-        p = pbuf_alloc(PBUF_RAW, status & 0xFFFF, PBUF_POOL);
+        p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
 
         if (p != NULL) {
+
 #if ETH_PAD_SIZE
             pbuf_remove_header(p, ETH_PAD_SIZE); /* drop the padding word */
 #endif
+
             /* Copy ethernet frame into pbuf */
-            memcpy((u8_t *) p->payload, (u8_t *) cur_rx_desc->u32Data,
-                   status & 0xFFFF);
-            p->len = status & 0xFFFF;
+            memcpy((u8_t *) p->payload, (u8_t *) cur_rx_desc->u32Data, p->len);
+
 #if ETH_PAD_SIZE
             pbuf_add_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
+
         } else {
-            printf("Corrupt\n");
+            printf("pbuf_alloc() failed.\n");
         }
     }
     cur_rx_desc->u32Status1 = EMAC_DESC_OWN_EMAC;
