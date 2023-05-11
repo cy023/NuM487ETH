@@ -1,5 +1,5 @@
 /**
- * @file test_07_udp_echoserver.c
+ * @file test_06_udp_echoserver.c
  * @author cy023
  * @date 2023.05.08
  * @brief lwIP - UDP echo server
@@ -17,7 +17,6 @@
 #include "netif/ethernet.h"
 
 #include "lwip/tcpip.h"
-#include "lwip/apps/lwiperf.h"
 #include "lwip/etharp.h"
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"
@@ -41,6 +40,17 @@ void printIPaddr(void)
            ipaddr_ntoa_r((const ip_addr_t *) &(gnetif.gw), tmp_buff, 16));
 }
 
+void check_connection(void)
+{
+    bool link_up = false;
+    ethernet_phy_get_link_status(&link_up);
+    /* Print IP address info */
+    if (link_up && gnetif.ip_addr.addr) {
+        printf("Hello Connection!\n");
+        printIPaddr();
+    }
+}
+
 void timer0_init(void)
 {
     // Set timer frequency to 100HZ
@@ -58,22 +68,12 @@ int main(void)
 {
     system_init();
     timer0_init();
-    printf("[test]: TCP/IP Ping Test over lwIP Stack\n\n");
+    printf("[test]: UDP echo server.\n\n");
+
     lwip_layer_init();
+    check_connection();
 
-    bool link_up = false;
-    ethernet_phy_get_link_status(&link_up);
-    /* Print IP address info */
-    if (link_up && gnetif.ip_addr.addr) {
-        printf("Hello Connection!\n");
-        printIPaddr();
-    }
-
-    NVIC_EnableIRQ(EMAC_TX_IRQn);
-    NVIC_EnableIRQ(EMAC_RX_IRQn);
-    EMAC_ENABLE_TX();  // TODO: Enable opportunity?
-    EMAC_ENABLE_RX();  // TODO: Enable opportunity?
-
+    /* UDP echo server */
     udpecho_raw_init();
 
     while (1) {

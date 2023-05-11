@@ -3,7 +3,7 @@
  * @author cy023
  * @date 2023.05.08
  * @brief lwIP - TCP/IP stack.
- * 
+ *
  */
 
 #include <stdio.h>
@@ -17,11 +17,11 @@
 #include "netif/ethernet.h"
 
 #include "lwip/tcpip.h"
-#include "lwip/apps/lwiperf.h"
 #include "lwip/etharp.h"
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"
 #include "lwip/init.h"
+
 
 volatile bool recv_flag = false;
 struct netif gnetif;
@@ -37,6 +37,17 @@ void printIPaddr(void)
            ipaddr_ntoa_r((const ip_addr_t *) &(gnetif.netmask), tmp_buff, 16));
     printf("GATEWAY_IP : %s\r\n\r\n",
            ipaddr_ntoa_r((const ip_addr_t *) &(gnetif.gw), tmp_buff, 16));
+}
+
+void check_connection(void)
+{
+    bool link_up = false;
+    ethernet_phy_get_link_status(&link_up);
+    /* Print IP address info */
+    if (link_up && gnetif.ip_addr.addr) {
+        printf("Hello Connection!\n");
+        printIPaddr();
+    }
 }
 
 void timer0_init(void)
@@ -57,20 +68,9 @@ int main(void)
     system_init();
     timer0_init();
     printf("[test]: TCP/IP Ping Test over lwIP Stack\n\n");
+
     lwip_layer_init();
-
-    bool link_up = false;
-    ethernet_phy_get_link_status(&link_up);
-    /* Print IP address info */
-    if (link_up && gnetif.ip_addr.addr) {
-        printf("Hello Connection!\n");
-        printIPaddr();
-    }
-
-    NVIC_EnableIRQ(EMAC_TX_IRQn);
-    NVIC_EnableIRQ(EMAC_RX_IRQn);
-    EMAC_ENABLE_TX();  // TODO: Enable opportunity?
-    EMAC_ENABLE_RX();  // TODO: Enable opportunity?
+    check_connection();
 
     while (1) {
         /* LWIP timers - ARP, DHCP, TCP, etc. */
