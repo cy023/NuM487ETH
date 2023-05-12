@@ -6,7 +6,7 @@
 #include "lwip/udp.h"
 #include "lwip/ip_addr.h"
 
-#include "udpecho_raw.h"
+#include "udpclient_raw.h"
 
 #define DEST_IP_ADDR0   192
 #define DEST_IP_ADDR1   168
@@ -15,9 +15,9 @@
 
 #define UDP_SERVER_PORT 7
 
-uint8_t data[100];
-volatile uint32_t message_count = 0;
-struct udp_pcb *upcb;
+static uint8_t data[100];
+static volatile uint32_t message_count = 0;
+static struct udp_pcb *upcb;
 
 /**
  * @brief This function is called when an UDP datagrm has been received on the
