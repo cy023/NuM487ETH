@@ -95,6 +95,10 @@ C_SOURCES += $(wildcard Middleware/lwIP-contrib/apps/tcpecho_raw/*.c)
 C_INCLUDES += -IMiddleware/udpclient_raw/
 C_SOURCES += $(wildcard Middleware/udpclient_raw/*.c)
 
+### TCP client raw
+C_INCLUDES += -IMiddleware/tcpclient_raw/
+C_SOURCES += $(wildcard Middleware/tcpclient_raw/*.c)
+
 ## ASM Source Path
 ASM_SOURCES += $(wildcard Device_Startup/*.S)
 
